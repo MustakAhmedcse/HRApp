@@ -1,0 +1,201 @@
+﻿
+@{
+    ViewBag.Title = "Leave";
+    // Layout = null;
+}
+<div class="panel panel-default" style="margin-top:10px" ng-controller="leaveCnt">
+    <div class="panel-heading">
+        <h4>Leave Approvers</h4>
+    </div>
+    <div class="panel-body">
+        <form name="addform" ng-submit="save()" class="form-horizontal" novalidate>
+            <div class="form-body">
+                <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Level.$invalid}">
+                    <label class="col-md-3 control-label">
+                        Level
+                        <span class="required">*</span>
+                    </label>
+                    <div class="col-md-9">
+                        <select class="form-control" ng-model="item.Level" name="Level" required ng-change="GetEmporDept(item.Level)">
+                            <option value='' selected>Select</option>
+                            <option value='Company' selected>Company</option>
+                            <option value='Department' selected>Department</option>
+                            <option value='Employeee' selected>Employeee</option>
+                        </select>
+                        <div class="form-control-focus"> </div>
+                        <span ng-show="submitted && addform.Level.$error.required" class="help-block">Level Required</span>
+                    </div>
+                </div>
+                <div class="form-group" ng-class="{ 'has-error' : submitted && addform.deporemp.$invalid}" ng-hide="item.Level=='Company'">
+                    <label class="col-md-3 control-label">
+                        Department/Employee
+                        <span class="required">*</span>
+                    </label>
+                    <div class="col-md-9">
+                        <select class="form-control" ng-model="item.deporemp" name="deporemp" ng-required="item.Level!='Company'" ng-options="d.Id as d.Name for d in DeporEmpList">
+                            <option value='' selected>Select </option>
+                        </select>
+                        <div class="form-control-focus"> </div>
+                        <span ng-show="submitted && addform.deporemp.$error.required" class="help-block">Department/Employee Required</span>
+                    </div>
+                </div>
+                <div class="form-group" ng-class="{ 'has-error' : submitted && addform.approver.$invalid}">
+                    <label class="col-md-3 control-label">
+                        Approvers
+                        <span class="required">*</span>
+                    </label>
+                    <div class="col-md-9">
+                        <div ng-repeat="approver in ApproverList">
+                            <label>
+                                <input type="checkbox" ng-model="item.approver.selected[approver.Id]" 
+                                       ng-true-value="'{{approver.Name}}'"
+                                       ng-false-value="''"
+                                       >    {{approver.Name}}
+                            </label>
+                        </div>
+                        <div class="form-control-focus"> </div>
+                        <span ng-show="submitted && addform.approver.$error.required" class="help-block">Approver Required</span>
+                    </div>
+                </div>
+                <button type="submit" ng-click="submitted=true" class="btn btn-success col-md-offset-6">Save</button>
+            </div>
+        </form>
+        <div class="table container" style="margin-top:10px">
+            <h5>* Approver must be differnt person of an employee</h5>
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr class="btn-primary">
+                        <th>Employ Name</th>
+                        <th>Approver Name</th>
+                        <th>Level</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-show="LeaveSetings.length <= 0"><td colspan="3" style="text-align:center;"><i class="fa fa-refresh"></i> No data Found !</td></tr>
+                    <tr ng-repeat="item in LeaveSetings">
+                        <td>{{item.EmployeeName}}</td>
+                        <td>{{item.ApproverName}}</td>
+                        <td>{{item.Leavel}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        HRApp.controller("leaveCnt", ["$scope", "$http",
+            function ($scope, $http) {
+                init();
+                function init() {
+                    initialize();
+                    getApproverList();
+                    getLeaveSetings();
+                }
+                function initialize() {
+                    $scope.item = {};
+                    $scope.DeporEmpList = [];
+                    $scope.GetEmporDept = GetEmporDept;
+                    $scope.ApproverList = [];
+                    $scope.getApproverList = getApproverList;
+                    $scope.LeaveSetings = [];
+                    $scope.getLeaveSetings = getLeaveSetings;
+                    $scope.res = {};
+                    $scope.data = {};
+                    $scope.resetForm = resetForm;
+                }
+                function resetForm() {
+                    $scope.class = {};
+                    $scope.class.ClassId = 0;
+                    $scope.addform.$setUntouched();
+                    $scope.addform.$setPristine();
+                    $scope.submitted = false;
+                    $scope.Id = '';
+                    getClasses();
+                }
+                function GetEmporDept(sItem) {
+                    var apiurl;
+                    if (sItem == "Department") {
+                        apiurl = "api/Departments";
+                    }
+                    else if (sItem == "Employeee") {
+                        apiurl = "api/Employees";
+                    }
+                    $scope.DeporEmpList = [];
+                    $http({
+                        method: 'GET',
+                        url: baseUrl + apiurl
+                    }).then(function successCallback(response) {
+                        $scope.DeporEmpList = response.data;
+                    }, function errorCallback(response) {
+                       // toastr["warning"](response.data.Message);
+                    });
+                };
+                function getApproverList() {
+                    $scope.ApproverList = [];
+                    $http({
+                        method: 'GET',
+                        url: baseUrl + 'api/EmployeesApprovers/'
+                    }).then(function successCallback(response) {
+                        $scope.ApproverList = response.data;
+                    }, function errorCallback(response) {
+                        toastr["warning"](response.data.Message);
+                    });
+                };
+                function getLeaveSetings() {
+                    $scope.LeaveSetings = [];
+                    $http({
+                        method: 'GET',
+                        url: baseUrl + 'api/LeaveSetings/'
+                    }).then(function successCallback(response) {
+                        $scope.LeaveSetings = response.data;
+                    }, function errorCallback(response) {
+                        toastr["warning"](response.data.Message);
+                    });
+                };
+                $scope.save = function save() {
+                    //if ($scope.addform.$invalid)
+                    //    return;
+                    $scope.finlObj = {};
+                    $scope.finlObj.deporemp = null;
+                    $scope.finlObj.approvers = "";
+                    $scope.finlObj.level = null;
+
+                    if (!$scope.item.Level) {
+                        toastr["warning"]("Lavel is missing");
+                        return;
+                    }
+                    $scope.finlObj.level =$scope.item.Level;
+                    angular.forEach($scope.item.approver.selected, function (value, key) {
+                        if (!value) {
+
+                        } else {
+                            $scope.finlObj.approvers += key + ",";
+                        }
+                    });
+                    var lastChar = $scope.finlObj.approvers.slice(-1);
+                    if (lastChar == ',') {
+                        $scope.finlObj.approvers = $scope.finlObj.approvers.slice(0, -1);
+                    }
+                    if (!$scope.finlObj.approvers) {
+                        toastr["warning"]("Approver is missing");
+                        return;
+                    }
+
+                    $scope.finlObj.deporemp = $scope.item.deporemp
+
+                    $http({
+                        method: 'POST',
+                        url: baseUrl + 'api/LeaveSetings/',
+                        data: $scope.finlObj
+                    }).then(function successCallback(response) {
+                        getLeaveSetings();
+                        //toastr["info"](response.data.message);
+                    }, function errorCallback(response) {
+                          getLeaveSetings();
+                       // toastr["warning"](response.data.Message);
+                    });
+                };
+            }]);
+    </script>
+}
