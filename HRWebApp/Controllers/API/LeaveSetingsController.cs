@@ -23,42 +23,7 @@ namespace HRWebApp.Controllers.API
             var result = SqlHelper.ExecuteDataTable("", "GetAllLeaveSetings", new object[] { });
             return Json(result);
         }
-
-        // PUT: api/LeaveSetings/5
-        [ResponseType(typeof(void))]
-        public IHttpActionResult PutLeaveSeting(int id, LeaveSeting leaveSeting)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (id != leaveSeting.LeaveSetingId)
-            {
-                return BadRequest();
-            }
-
-            db.Entry(leaveSeting).State = EntityState.Modified;
-
-            try
-            {
-                db.SaveChanges();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LeaveSetingExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return StatusCode(HttpStatusCode.NoContent);
-        }
-
+        
         // POST: api/LeaveSetings
         [ResponseType(typeof(LeaveSeting))]
         public IHttpActionResult PostLeaveSeting(LeaveRequest req)
@@ -138,23 +103,6 @@ namespace HRWebApp.Controllers.API
             }
             return Ok(0);
         }
-
-        // DELETE: api/LeaveSetings/5
-        [ResponseType(typeof(LeaveSeting))]
-        public IHttpActionResult DeleteLeaveSeting(int id)
-        {
-            LeaveSeting leaveSeting = db.LeaveSetings.Find(id);
-            if (leaveSeting == null)
-            {
-                return NotFound();
-            }
-
-            db.LeaveSetings.Remove(leaveSeting);
-            db.SaveChanges();
-
-            return Ok(leaveSeting);
-        }
-
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -162,11 +110,6 @@ namespace HRWebApp.Controllers.API
                 db.Dispose();
             }
             base.Dispose(disposing);
-        }
-
-        private bool LeaveSetingExists(int id)
-        {
-            return db.LeaveSetings.Count(e => e.LeaveSetingId == id) > 0;
         }
     }
 }
