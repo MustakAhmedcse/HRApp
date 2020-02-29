@@ -5,7 +5,7 @@ using System.Web;
 
 namespace HRWebApp.Models
 {
-    public class LeaveRequest
+    public class LeaveApprovalRequest
     {
         public string level { get; set; }
         public string approvers { get; set; }

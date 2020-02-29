@@ -207,7 +207,7 @@
     <Compile Include="Models\DepartmetnEmployee.cs" />
     <Compile Include="Models\Employee.cs" />
     <Compile Include="Models\IdentityModels.cs" />
-    <Compile Include="Models\LeaveRequest.cs" />
+    <Compile Include="Models\LeaveApprovalRequest.cs" />
     <Compile Include="Models\LeaveSeting.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

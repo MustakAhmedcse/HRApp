@@ -26,7 +26,7 @@ namespace HRWebApp.Controllers.API
         
         // POST: api/LeaveSetings
         [ResponseType(typeof(LeaveSeting))]
-        public IHttpActionResult PostLeaveSeting(LeaveRequest req)
+        public IHttpActionResult PostLeaveSeting(LeaveApprovalRequest req)
         {
             if (!ModelState.IsValid)
             {
@@ -65,9 +65,9 @@ namespace HRWebApp.Controllers.API
 
             foreach (LeaveSeting seting in setinglist)
             {
-                bool aa = !db.LeaveSetings.Where(e => e.EmployeeId == seting.EmployeeId).Any();
-                bool aaa = db.LeaveSetings.Where(e => e.EmployeeId == seting.EmployeeId && e.Leavel == seting.Leavel && e.ApproverId != seting.ApproverId).Any();
-               if (aa||aaa)
+                bool isNew = !db.LeaveSetings.Where(e => e.EmployeeId == seting.EmployeeId).Any();
+                bool IspproverDiff = db.LeaveSetings.Where(e => e.EmployeeId == seting.EmployeeId && e.Leavel == seting.Leavel && e.ApproverId != seting.ApproverId).Any();
+               if (isNew || IspproverDiff)
                 {
                 db.LeaveSetings.Add(seting);
                 }
